@@ -27,17 +27,17 @@ app.post('/api/leads', async (req, res) => {
   try {
     const { name, email, phone, courseLookingFor, message } = req.body;
 
-    // Validation
-    if (!name || !email || !phone || !courseLookingFor) {
+    // Validation - only name and phone are required
+    if (!name || !phone) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide all required fields',
+        message: 'Please provide name and phone number',
       });
     }
 
-    // Email validation
+    // Email validation (only if email is provided)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (email && !emailRegex.test(email)) {
       return res.status(400).json({
         success: false,
         message: 'Please provide a valid email address',
@@ -56,9 +56,9 @@ app.post('/api/leads', async (req, res) => {
     // Prepare lead data for email notifications
     const leadData = {
       name,
-      email,
+      email: email || 'Not provided',
       phone,
-      course_looking_for: courseLookingFor,
+      course_looking_for: courseLookingFor || 'General Enquiry',
       message: message || 'No additional message',
       submitted_at: new Date().toISOString(),
     };
